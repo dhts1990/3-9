@@ -7,7 +7,7 @@ resource "random_integer" "subnet_id_selection" {
 }
 
 resource "aws_instance" "webapp" {
-  ami                    = "ami-04c913012f8977029"
+  ami                    = data.aws_ami.linux2023.id
   instance_type          = var.instance_type
   subnet_id              = var.public_subnet_ids[random_integer.subnet_id_selection.result]
   vpc_security_group_ids = [aws_security_group.webapp.id]
@@ -18,6 +18,13 @@ resource "aws_instance" "webapp" {
   associate_public_ip_address = true
   tags = {
     Name = "${var.name_prefix}-webapp"
+  }
+}
+data "aws_ami" "linux2023" {
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*x86_64"]
   }
 }
 
